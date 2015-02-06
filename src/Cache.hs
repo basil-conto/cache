@@ -1,32 +1,25 @@
 
 {-
-  TODO: -Consider Data.BitVector
-        -Consider Repa
+  TODO: -Consider Repa
         -Consider eliminating set's assoc attribute
 -}
 
-import Prelude (Eq(..), Show(..), Int(..), Integer(..), Bool(..), String(..), Integral(..),
-                Monad(..), (+), (-), (*), (^), (.), ($), mapM_, otherwise,
-                putStrLn, return, length, replicate, round, logBase, ceiling,
-                fromIntegral, toEnum, fromEnum, error, putStr)
+import Prelude (Eq(..), Show(..), Bool(..), Int(),
+                (+), (-), (.), ($), div, otherwise, fromEnum, fromIntegral,
+                logBase, ceiling, putStrLn, return)
 
-import Text.Printf (printf)
-
-import Data.Char (toUpper)
-import Data.Either
 import Data.Maybe
-import Numeric (showHex)
+import Data.Either
+import Data.BitVector
 
-import System.IO (IO(..))
+import Text.Printf   (printf)
 import Control.Monad (forM_, foldM)
 
 import qualified Data.List as L
-import Data.List ((++), foldl, mapAccumL)
+import Data.List ((++))
 
 import qualified Data.Vector as V
 import Data.Vector (Vector(), (!), (//))
-
-import qualified Data.BitVector as BV
 
 -- Datatypes -------------------------------------------------------------------
 
@@ -126,39 +119,37 @@ lru (Set _ _ (Matrix m)) = fromJust $ V.findIndex (V.all (== False)) m
 -}
 emptyCache :: Int -> Int -> Int -> Int -> Cache
 emptyCache l k n w =
-  let offset = lg2 l
-      tagLSB = offset + (lg2 n)
+  let offset = lgBase 2 l
+      tagLSB = offset + (lgBase 2 n)
   in Cache (V.replicate n (empty k)) offset tagLSB w 0
-  where lg2 = fromEnum . ceiling . (logBase 2) . fromIntegral
 
 accessCache :: Cache -> Int -> Either Cache Cache
 accessCache cache@(Cache s o t w h) addr =
   let set | t == o    = 0
-          | otherwise = fromEnum $ BV.nat $ (BV.bitVec 16 addr) BV.@@ (t - 1, o)
-      tag = fromEnum $ (BV.bitVec 16 addr) BV.>>. (BV.bitVec 16 t)
-      result = access (s ! set) tag
-  in case result of
-       (Left  new) -> Left  $ cache { sets = s // [(set, new)] }
-       (Right new) -> Right $ cache { sets = s // [(set, new)], hits = h + 1 }
+          | otherwise = fromEnum $ nat $ (bitVec 16 addr) @@ (t - 1, o)
+      tag = fromEnum $ (bitVec 16 addr) >>. (bitVec 16 t)
+  in either (\ new -> Left  $ cache { sets = s // [(set, new)] } )
+            (\ new -> Right $ cache { sets = s // [(set, new)], hits = h + 1 } )
+            (access (s ! set) tag)
 
-hexFormat :: Int -> String
-hexFormat x = let hexRep = L.map toUpper $ showHex x ""
-              in "0x" ++ (replicate (4 - (length hexRep)) '0') ++ hexRep
+lgBase b = fromEnum . ceiling . (logBase b) . fromIntegral
 
 runTrace =
-  foldM (\ c a -> do
-    putStr $ hexFormat a
-    either (\ l -> do { putStrLn " Miss"; return l })
-           (\ r -> do { putStrLn " Hit" ; return r })
+  foldM (\ c@(Cache _ _ _ w _) a -> do
+    printf "0x%.*X " (w `div` 4) a
+    either (\ l -> do { putStrLn "Miss"; return l })
+           (\ r -> do { putStrLn "Hit" ; return r })
            (accessCache c a))
 
-main =
+main = do
+  let traceLength = L.length trace
+      width = lgBase 10 traceLength
   forM_ caches (\ [l, k, n] -> do
-    putStrLn $ "L = " ++ show l ++ ", K = " ++ show k ++ ", N = " ++ show n
+    printf "L = %d, K = %d, N = %d\n" l k n
     result <- runTrace (emptyCache l k n 16) trace
     let numHits = hits result
-    putStrLn $ "Hits:   " ++ show numHits
-    putStrLn $ "Misses: " ++ show ((L.length trace) - numHits) ++ "\n")
+    printf "Hits:   %*d\n"   width numHits
+    printf "Misses: %*d\n\n" width (traceLength - numHits))
   where
     trace :: [Int]
     trace =  [ 0x0000, 0x0004, 0x000C, 0x2200, 0x00D0, 0x00E0, 0x1130, 0x0028,
