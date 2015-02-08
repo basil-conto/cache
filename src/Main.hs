@@ -1,22 +1,22 @@
 module Main where
 
+import Prelude (IO(), Int(), (-), ($))
+
+import Data.List     (length)
 import Text.Printf   (printf)
 import Control.Monad (forM_, void)
 
-import qualified Data.List as L
-
-import qualified Cache as C
-
-import LogUtils
+import Cache    (hits, empty, runTrace)
+import LogUtils (log10)
 
 main :: IO ()
 main = do
-  let traceLength = L.length trace
+  let traceLength = length trace
       width = log10 traceLength
   forM_ caches (\ [l, k, n] -> do
     void $ printf "L = %d, K = %d, N = %d\n" l k n
-    result <- C.runTrace (C.empty l k n 16) trace
-    let numHits = C.hits result
+    result <- runTrace (empty l k n 16) trace
+    let numHits = hits result
     void $ printf "Hits:   %*d\n"   width numHits
     void $ printf "Misses: %*d\n\n" width (traceLength - numHits))
   where

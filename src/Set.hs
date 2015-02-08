@@ -12,8 +12,8 @@ import Data.Vector (Vector(), (//))
 
 -- Datatypes -------------------------------------------------------------------
 
-data Array = Array (Vector (Maybe Int))
-data Matrix = Matrix (Vector (Vector Bool))
+newtype Array = Array (Vector (Maybe Int))
+newtype Matrix = Matrix (Vector (Vector Bool))
 
 data Set = Set {
                  assoc  :: Int,

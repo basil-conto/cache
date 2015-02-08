@@ -1,16 +1,17 @@
-module Cache where
-
-{-
-  TODO: -Consider Repa
-        -Consider eliminating set's assoc attribute
--}
+module Cache
+( empty
+, access
+, runTrace
+, width
+, hits
+) where
 
 import Prelude (Eq(..), Show(..), Bool(..), Num(..), Int(), IO(),
                 RealFrac(..), Floating(..), Integral(..),
                 (.), ($), otherwise, fromEnum, fromIntegral, putStrLn, return)
 
 import Data.Either
-import Data.BitVector
+import Data.BitVector hiding (width)
 
 import Text.Printf   (printf)
 import Control.Monad (foldM, void)
@@ -25,24 +26,22 @@ import Set (Set())
 
 import LogUtils
 
--- Datatypes -------------------------------------------------------------------
+-- Datatype --------------------------------------------------------------------
 
 data Cache = Cache {
-                     sets   :: Vector Set,
-                     offset :: Int,
-                     tagLSB :: Int,
-                     width  :: Int,
-                     hits   :: Int
+                     sets    :: Vector Set,
+                     _offset :: Int,
+                     _tagLSB :: Int,
+                     width   :: Int,
+                     hits    :: Int
                    }
 
 -- Show instance ---------------------------------------------------------------
 
 instance Show Cache where
-  show (Cache s o t w h) = "Sets:          " ++ show (V.length s) ++ "\n" ++
-                           "Offset:        " ++ show o            ++ "\n" ++
-                           "Tag LSB:       " ++ show t            ++ "\n" ++
-                           "Address width: " ++ show w            ++ "\n" ++
-                           "Hits:          " ++ show h
+  show (Cache s _ _ w h) = "Sets:  " ++ show (V.length s) ++ "\n" ++
+                           "Width: " ++ show w            ++ "\n" ++
+                           "Hits:  " ++ show h
 
 -- Functions -------------------------------------------------------------------
 
@@ -55,9 +54,9 @@ instance Show Cache where
 -}
 empty :: Int -> Int -> Int -> Int -> Cache
 empty l k n w =
-  let off = log2 l
-      tag = off + (log2 n)
-  in Cache (V.replicate n (S.empty k)) off tag w 0
+  let offset = log2 l
+      tagLSB = offset + (log2 n)
+  in Cache (V.replicate n (S.empty k)) offset tagLSB w 0
 
 access :: Cache -> Int -> Either Cache Cache
 access cache@(Cache s o t w h) addr =
