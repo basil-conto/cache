@@ -1,14 +1,24 @@
 module Main where
 
+import Text.Printf   (printf)
+import Control.Monad (forM_, void)
+
+import qualified Data.List as L
+
 import qualified Cache as C
 
-main =
+import LogUtils
+
+main :: IO ()
+main = do
+  let traceLength = L.length trace
+      width = log10 traceLength
   forM_ caches (\ [l, k, n] -> do
-    putStrLn $ "L = " ++ show l ++ ", K = " ++ show k ++ ", N = " ++ show n
-    result <- runTrace (emptyCache l k n 16) trace
-    let numHits = hits result
-    putStrLn $ "Hits:   " ++ show numHits
-    putStrLn $ "Misses: " ++ show ((L.length trace) - numHits) ++ "\n")
+    void $ printf "L = %d, K = %d, N = %d\n" l k n
+    result <- C.runTrace (C.empty l k n 16) trace
+    let numHits = C.hits result
+    void $ printf "Hits:   %*d\n"   width numHits
+    void $ printf "Misses: %*d\n\n" width (traceLength - numHits))
   where
     trace :: [Int]
     trace =  [ 0x0000, 0x0004, 0x000C, 0x2200, 0x00D0, 0x00E0, 0x1130, 0x0028,
