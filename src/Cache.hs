@@ -6,24 +6,19 @@ module Cache
 , hits
 ) where
 
-import Prelude (Eq(..), Show(..), Bool(..), Num(..), Int(), IO(),
-                RealFrac(..), Floating(..), Integral(..),
-                (.), ($), otherwise, fromEnum, fromIntegral, putStrLn, return)
-
-import Data.Either
-import Data.BitVector hiding (width)
+import Prelude (Eq(..), Show(..), Bool(..), Int(), IO(), (+), (-), ($),
+                div, otherwise, fromEnum, putStrLn, return)
 
 import Text.Printf   (printf)
 import Control.Monad (foldM, void)
 
+import Data.Either
 import Data.List ((++))
-
-import qualified Data.Vector as V
-import Data.Vector (Vector(), (!), (//))
+import Data.BitVector hiding (width, replicate)
+import Data.Vector (Vector(), (!), (//), length, replicate)
 
 import qualified Set as S
 import Set (Set())
-
 import LogUtils
 
 -- Datatype --------------------------------------------------------------------
@@ -39,8 +34,8 @@ data Cache = Cache {
 -- Show instance ---------------------------------------------------------------
 
 instance Show Cache where
-  show (Cache s _ _ w h) = "Sets:  " ++ show (V.length s) ++ "\n" ++
-                           "Width: " ++ show w            ++ "\n" ++
+  show (Cache s _ _ w h) = "Sets:  " ++ show (length s) ++ "\n" ++
+                           "Width: " ++ show w          ++ "\n" ++
                            "Hits:  " ++ show h
 
 -- Functions -------------------------------------------------------------------
@@ -56,7 +51,7 @@ empty :: Int -> Int -> Int -> Int -> Cache
 empty l k n w =
   let offset = log2 l
       tagLSB = offset + (log2 n)
-  in Cache (V.replicate n (S.empty k)) offset tagLSB w 0
+  in Cache (replicate n (S.empty k)) offset tagLSB w 0
 
 access :: Cache -> Int -> Either Cache Cache
 access cache@(Cache s o t w h) addr =

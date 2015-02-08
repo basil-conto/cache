@@ -1,11 +1,7 @@
 
 * General
 
-- Haddock
-- Consider Repa
+- Haddock everything!
+- Consider Repa in place of Array / Matrix / Vector
 - More monad!
-
-* Set
-
-  - Eliminate assoc attribute?
 

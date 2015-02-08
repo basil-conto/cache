@@ -13,12 +13,16 @@ main :: IO ()
 main = do
   let traceLength = length trace
       width = log10 traceLength
+
   forM_ caches (\ [l, k, n] -> do
     void $ printf "L = %d, K = %d, N = %d\n" l k n
+
     result <- runTrace (empty l k n 16) trace
     let numHits = hits result
+
     void $ printf "Hits:   %*d\n"   width numHits
     void $ printf "Misses: %*d\n\n" width (traceLength - numHits))
+
   where
     trace :: [Int]
     trace =  [ 0x0000, 0x0004, 0x000C, 0x2200, 0x00D0, 0x00E0, 0x1130, 0x0028,
