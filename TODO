@@ -4,4 +4,7 @@
 - Haddock everything!
 - Consider Repa in place of Array / Matrix / Vector
 - More monad!
+- Get rid of Array and Matrix types?
+- Read trace from file
+- Command-line arguments
 

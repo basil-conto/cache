@@ -22,8 +22,8 @@ data Set = Set { dirs :: Array, matrix :: Matrix }
 -- Functions -------------------------------------------------------------------
 
 {- |
-  Returns a vanilla Set of the given associativity k, with k empty 
-  directories and an LRU matrix of size k initialised to all zeros.
+  Returns a vanilla 'Set' of the given associativity @k@, with @k@ empty 
+  directories and an LRU matrix of size @k@ initialised to all zeros.
 -}
 empty :: Int -> Set
 empty k = Set (replicate k Nothing) (emptyMatrix k)
@@ -33,10 +33,13 @@ emptyMatrix :: Int -> Matrix
 emptyMatrix k = replicate k $ replicate k False
 
 {- |
-  Accesses the given Tag in the given Set and returns either:
-    -(Left  newSet) on a cache miss; or
-    -(Right newSet) on a cache hit,
-  where newSet is the given Set following the access.
+  Accesses the given Tag in the given 'Set' and returns either:
+
+    * @(Left  newSet)@ on a cache miss; or
+
+    * @(Right newSet)@ on a cache hit,
+
+  where @newSet@ is the given 'Set' following the access.
 -}
 access :: Set -> Int -> Either Set Set
 access set@(Set d _) tag
@@ -53,9 +56,11 @@ access set@(Set d _) tag
     useSlot slot = use ( set { dirs = d // [(slot, Just tag)] } ) slot
 
 {- |
-  Updates the LRU matrix with the given index i by:
-    -setting row i to all ones; and
-    -setting column i to all zeros.
+  Updates the LRU matrix with the given index @i@ by:
+
+    * setting row @i@ to all ones; and
+
+    * setting column @i@ to all zeros.
 -}
 use :: Set -> Int -> Set
 use set@(Set _ m) dir =
@@ -64,7 +69,7 @@ use set@(Set _ m) dir =
   in set { matrix = step1 }
 
 {- |
-  Returns the index of the LRU directory in the given set. This corresponds to
+  Returns the index of the LRU directory in the given 'Set'. This corresponds to
   the index of the row of all ones in the LRU matrix.
 -}
 lru :: Set -> Int

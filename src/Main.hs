@@ -1,4 +1,6 @@
-module Main where
+module Main
+( main
+) where
 
 import Prelude (IO(), Int(), (-), ($))
 
@@ -9,6 +11,7 @@ import Control.Monad (forM_, void)
 import Cache    (hits, empty, runTrace)
 import LogUtils (log10)
 
+-- | Sample run
 main :: IO ()
 main = do
   let traceLength = length trace

@@ -41,10 +41,16 @@ instance Show Cache where
 -- Functions -------------------------------------------------------------------
 
 {- |
-  Initialises a generalised cache datatype with the parameters
-    l - block size
-    k - degree of associativity
-    n - number of sets
+  Initialises a generalised 'Cache' datatype with the parameters
+
+    * @l@ - block size
+
+    * @k@ - degree of associativity
+
+    * @n@ - number of sets
+
+    * @w@ - address width
+
   all of which should be non-zero, positive integers.
 -}
 empty :: Int -> Int -> Int -> Int -> Cache
