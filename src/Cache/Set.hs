@@ -1,4 +1,4 @@
-module Set
+module Cache.Set
 ( Set()
 , empty
 , access
@@ -6,18 +6,18 @@ module Set
 
 import Prelude (Eq(..), Show(..), Bool(..), Int(), ($), otherwise)
 
-import Data.Vector (Vector(),
-                    (//), length, map, all, replicate, elemIndex, findIndex)
+import Data.Vector (Vector(), (//), length, map, all,
+                    replicate, elemIndex, findIndex)
 
 import Data.Maybe
 import Data.Either
 
--- Datatypes -------------------------------------------------------------------
+-- Datatype --------------------------------------------------------------------
 
-type Array  = Vector (Maybe Int)
-type Matrix = Vector (Vector Bool)
-
-data Set = Set { dirs :: Array, matrix :: Matrix }
+data Set = Set {
+                 dirs :: Vector (Maybe Int),
+                 matrix :: Vector (Vector Bool)
+               }
 
 -- Functions -------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ empty :: Int -> Set
 empty k = Set (replicate k Nothing) (emptyMatrix k)
 
 -- | Returns an LRU matrix of the given size initialised to all zeros.
-emptyMatrix :: Int -> Matrix
+emptyMatrix :: Int -> Vector (Vector Bool)
 emptyMatrix k = replicate k $ replicate k False
 
 {- |

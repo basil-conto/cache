@@ -8,8 +8,8 @@ import Data.List     (length)
 import Text.Printf   (printf)
 import Control.Monad (forM_, void)
 
-import Cache    (hits, empty, runTrace)
-import LogUtils (log10)
+import Cache.Cache    (hits, empty, runTrace)
+import Cache.LogUtils (log10)
 
 -- | Sample run
 main :: IO ()

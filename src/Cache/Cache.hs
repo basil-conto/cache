@@ -1,4 +1,4 @@
-module Cache
+module Cache.Cache
 ( empty
 , access
 , runTrace
@@ -17,9 +17,9 @@ import Data.List ((++))
 import Data.BitVector hiding (width, replicate)
 import Data.Vector (Vector(), (!), (//), length, replicate)
 
-import qualified Set as S
-import Set (Set())
-import LogUtils
+import qualified Cache.Set as S
+import Cache.Set (Set())
+import Cache.LogUtils
 
 -- Datatype --------------------------------------------------------------------
 

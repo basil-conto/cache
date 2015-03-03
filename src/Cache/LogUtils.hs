@@ -1,4 +1,4 @@
-module LogUtils where
+module Cache.LogUtils where
 
 import Prelude (Floating(..),   -- logBase
                 RealFrac(..),   -- ceiling
