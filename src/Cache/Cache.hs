@@ -6,30 +6,28 @@ module Cache.Cache
 , hits
 ) where
 
-import Prelude (Eq(..), Show(..), Bool(..), Int(), IO(), (+), (-), ($),
-                div, otherwise, fromEnum, putStrLn, return)
+import Prelude        (Either(..), Int(), Double(), Show(), IO(),
+                       (+), (-), ($), (==), (++), otherwise, either, show,
+                       putStrLn, div, ceiling, logBase, fromEnum, fromIntegral)
 
-import Text.Printf   (printf)
-import Control.Monad (foldM, void)
+import Control.Monad  (foldM, void, return)
+import Text.Printf    (printf)
 
-import Data.Either
-import Data.List ((++))
-import Data.BitVector hiding (width, replicate)
-import Data.Vector (Vector(), (!), (//), length, replicate)
+import Data.BitVector ((>>.), (@@), bitVec, nat)
+import Data.Vector    (Vector(), (!), (//), length, replicate)
 
 import qualified Cache.Set as S
-import Cache.Set (Set())
-import Cache.LogUtils
+import Cache.Set      (Set())
 
 -- Datatype --------------------------------------------------------------------
 
-data Cache = Cache {
-                     sets    :: Vector Set,
-                     _offset :: Int,
-                     _tagLSB :: Int,
-                     width   :: Int,
-                     hits    :: Int
-                   }
+data Cache = Cache
+  { sets    :: Vector Set
+  , _offset :: Int
+  , _tagLSB :: Int
+  , width   :: Int
+  , hits    :: Int
+  }
 
 -- Show instance ---------------------------------------------------------------
 
@@ -58,6 +56,9 @@ empty l k n w =
   let offset = log2 l
       tagLSB = offset + (log2 n)
   in Cache (replicate n (S.empty k)) offset tagLSB w 0
+  where
+    log2 :: Int -> Int
+    log2 x = ceiling $ logBase 2 (fromIntegral x :: Double) :: Int
 
 access :: Cache -> Int -> Either Cache Cache
 access cache@(Cache s o t w h) addr =
@@ -75,4 +76,3 @@ runTrace =
     either (\ l -> do { putStrLn "Miss"; return l })
            (\ r -> do { putStrLn "Hit" ; return r })
            (access c a))
-
