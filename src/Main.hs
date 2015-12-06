@@ -2,20 +2,18 @@ module Main
 ( main
 ) where
 
-import Prelude (IO(), Int(), (-), ($))
+import Prelude        (IO(), Int(), (-), ($), (.), length, show)
 
-import Data.List     (length)
-import Text.Printf   (printf)
-import Control.Monad (forM_, void)
+import Text.Printf    (printf)
+import Control.Monad  (forM_, void)
 
 import Cache.Cache    (hits, empty, runTrace)
-import Cache.LogUtils (log10)
 
 -- | Sample run
 main :: IO ()
 main = do
   let traceLength = length trace
-      width = log10 traceLength
+      width = length . show $ traceLength
 
   forM_ caches (\ [l, k, n] -> do
     void $ printf "L = %d, K = %d, N = %d\n" l k n
@@ -23,8 +21,8 @@ main = do
     result <- runTrace (empty l k n 16) trace
     let numHits = hits result
 
-    void $ printf "Hits:   %*d\n"   width numHits
-    void $ printf "Misses: %*d\n\n" width (traceLength - numHits))
+    void $ printf "Hits   : %*d\n"   width numHits
+    void $ printf "Misses : %*d\n\n" width (traceLength - numHits))
 
   where
     trace :: [Int]
