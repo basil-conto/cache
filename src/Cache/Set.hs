@@ -4,20 +4,19 @@ module Cache.Set
 , access
 ) where
 
-import Prelude (Eq(..), Show(..), Bool(..), Int(), ($), otherwise)
+import Prelude      (Either(..), Bool(..), Int(), ($), (==), otherwise, either)
 
-import Data.Vector (Vector(), (//), length, map, all,
-                    replicate, elemIndex, findIndex)
+import Data.Maybe   (Maybe(..), isJust, fromJust)
 
-import Data.Maybe
-import Data.Either
+import Data.Vector  (Vector(), (//), length, map, all,
+                     replicate, elemIndex, findIndex)
 
 -- Datatype --------------------------------------------------------------------
 
-data Set = Set {
-                 dirs :: Vector (Maybe Int),
-                 matrix :: Vector (Vector Bool)
-               }
+data Set = Set
+  { dirs   :: Vector (Maybe  Int)
+  , matrix :: Vector (Vector Bool)
+  }
 
 -- Functions -------------------------------------------------------------------
 
